@@ -1,0 +1,128 @@
+% !TEX program = pdflatex
+% This file is a visual guide to the available box commands.
+\documentclass[a4paper,11pt]{article}
+\usepackage{../cleannotes}
+\documentsetup{
+  title       = {CleanNotes},
+  subtitle    = {Visual styles and quick reference},
+  shorttitle  = {CleanNotes - quick reference},
+  author      = {First name Last name}
+}
+
+% Example-only helper and custom variant. Not required by the template.
+\newcommand{\cmd}[1]{{\small\ttfamily\detokenize{#1}}}
+\newaccentbox{custombox}{leafgreen}{Lorem ipsum.}
+
+\begin{document}
+\makedocumenthead
+Choose a box by its appearance. Titles, colours and content are yours to choose.
+Every box uses the same three optional arguments:
+\begin{quote}\small
+\cmd{\begin{accentbox}[Title][docblue][extra options]}\par
+Content \ldots\quad\cmd{\end{accentbox}}
+\end{quote}
+Omit the options for the defaults. Use \cmd{[]} for an empty title.
+
+\section*{The six visual styles}
+\begin{accentbox}[Lorem ipsum.]
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor
+incididunt ut labore et dolore magna aliqua.
+\end{accentbox}
+{\small\cmd{accentbox} --- Soft background, coloured left border, inline title.}
+
+\begin{framedbox}[Lorem ipsum]
+Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+\[a^2+b^2=c^2\]
+\end{framedbox}
+{\small\cmd{framedbox} --- Thin outline, separate tinted title bar.}
+
+\begin{numberedbox}[Lorem ipsum]\label{box:lorem}
+Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+\end{numberedbox}
+{\small\cmd{numberedbox} --- Automatic number; supports \cmd{\label} and \cmd{\ref}.}
+
+\begin{cardbox}[Lorem ipsum]
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut enim ad minim veniam.
+\end{cardbox}
+{\small\cmd{cardbox} --- Smaller type and padding, title on its own line.}
+
+\begin{solidbox}[Lorem ipsum]
+Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+\end{solidbox}
+{\small\cmd{solidbox} --- Solid colour with white text.}
+
+\begin{splitbox}[Lorem ipsum]\rightheading{Dolor sit amet}
+Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+\end{splitbox}
+{\small\cmd{splitbox} --- Two heading fields; start the body with \cmd{\rightheading{Right text}}.}
+
+\clearpage
+\section*{Colours and custom variants}
+\begin{minipage}[t]{0.48\linewidth}
+\begin{accentbox}[Lorem ipsum.][alertred]
+Lorem ipsum dolor sit amet.
+\end{accentbox}
+\cmd{\begin{accentbox}[Title.][alertred]}
+\end{minipage}\hfill
+\begin{minipage}[t]{0.48\linewidth}
+\begin{accentbox}[Lorem ipsum.][leafgreen]
+Lorem ipsum dolor sit amet.
+\end{accentbox}
+\cmd{\begin{accentbox}[Title.][leafgreen]}
+\end{minipage}
+
+Available colours: \textcolor{docblue}{\cmd{docblue}},
+\textcolor{tiporange}{\cmd{tiporange}}, \textcolor{alertred}{\cmd{alertred}},
+\textcolor{leafgreen}{\cmd{leafgreen}}, \textcolor{slategray}{\cmd{slategray}}
+and \textcolor{softgray}{\cmd{softgray}}. Any named xcolor colour also works.
+
+Define a reusable variant once in the preamble:
+\par\cmd{\newaccentbox{custombox}{leafgreen}{Lorem ipsum.}}
+\begin{custombox}
+Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+\end{custombox}
+Then use \cmd{\begin{custombox}} \ldots\ \cmd{\end{custombox}}.
+It accepts the same three optional arguments as the built-in boxes.
+For a one-off adjustment, use the third argument:
+\par\cmd{\begin{accentbox}[Title.][docblue][colback=white]}
+
+\section*{Other built-in commands}
+{\small\renewcommand{\arraystretch}{1.3}
+\begin{tabularx}{\linewidth}{@{}lX@{}}
+\toprule
+\textbf{Command} & \textbf{Purpose or output} \\
+\midrule
+\cmd{\documentsetup{title={...},author={...}}} & Title-block and PDF metadata. \\
+\cmd{\makedocumenthead} & Compact title block, as on page 1. \\
+\cmd{\newaccentbox{name}{colour}{Title.}} & Define an accent-box variant. \\
+\cmd{\rightheading{Right text}} & Right heading inside \cmd{splitbox}. \\
+\cmd{\begin{steps} ... \end{steps}} & Labelled steps: \cmd{\item[Label] Content.} \\
+\cmd{\step{Lorem}} & \step{Lorem} ipsum dolor sit amet. \\
+\cmd{\reason{lorem ipsum}} & In maths: \(x=2\quad\reason{lorem ipsum}\). \\
+\cmd{\begin{proof} ... \end{proof}} & Standard proof with an ending square. \\
+\bottomrule
+\end{tabularx}}
+\begin{steps}
+\item[Lorem ipsum] Dolor sit amet, consectetur adipiscing elit.
+\item[Dolor sit amet] Ut enim ad minim veniam.
+\end{steps}
+\begin{proof}
+Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+\end{proof}
+
+\section*{Language, layout and standard LaTeX}
+English is the default. In your project, change the package line in
+\cmd{preamble.tex} to
+\cmd{\usepackage[dutch]{cleannotes}} for Dutch labels and hyphenation.
+Command names stay the same. Your own titles and text remain yours to translate.
+
+Other options: \cmd{[unnumbered]} for headings without numbers;
+\cmd{[onepager]} for landscape A4 with narrow margins and no running header/footer.
+Options combine: \cmd{[dutch,onepager]}. Content determines the page count.
+
+Ready to use: \cmd{\section}, \cmd{\subsection}, \cmd{\tableofcontents},
+\cmd{itemize}, \cmd{enumerate}, \cmd{equation}, \cmd{align}, \cmd{tabularx},
+\cmd{figure}, \cmd{\includegraphics}, TikZ, \cmd{multicols}, \cmd{\href} and
+\cmd{\url}. Cross-reference: Box~\ref{box:lorem} via \cmd{\ref{box:lorem}}.
+See the preamble for optional plotting and bibliography packages.
+\end{document}

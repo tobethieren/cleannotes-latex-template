@@ -1,0 +1,25 @@
+# Build products; the supplied example.pdf remains included.
+*.aux
+*.log
+*.out
+*.toc
+*.lof
+*.lot
+*.fls
+*.fdb_latexmk
+*.synctex.gz
+*.synctex(busy)
+*.bbl
+*.bcf
+*.blg
+*.run.xml
+*.xdv
+*.nav
+*.snm
+*.vrb
+*.bak
+*.zip
+main.pdf
+build/
+.DS_Store
+Thumbs.db

@@ -1,0 +1,179 @@
+% CleanNotes - typography, page layout and reusable visual box styles.
+% Extracted from the original proposal and tutoring document styles.
+% See example.tex / example.pdf for the complete public interface.
+\NeedsTeXFormat{LaTeX2e}[2022-06-01]
+\ProvidesPackage{cleannotes}[2026/10/14 v1.0 Reusable document style]
+
+% English by default. Use [dutch] to switch automatic labels and hyphenation.
+\newif\ifcn@onepager
+\newif\ifcn@unnumbered
+\newif\ifcn@english
+\cn@englishtrue
+\DeclareOption{onepager}{\cn@onepagertrue}
+\DeclareOption{unnumbered}{\cn@unnumberedtrue}
+\DeclareOption{english}{\cn@englishtrue}
+\DeclareOption{dutch}{\cn@englishfalse}
+\DeclareOption*{\PackageError{cleannotes}{Unknown option '\CurrentOption'}
+  {Available options: english, dutch, onepager, unnumbered.}}
+\ProcessOptions*\relax
+
+% Page layout and typography.
+\ifcn@onepager
+  \RequirePackage[a4paper,landscape,top=0.8cm,bottom=0.8cm,
+    left=0.9cm,right=0.9cm]{geometry}
+\else
+  \RequirePackage[a4paper,top=2cm,bottom=2cm,left=2.3cm,right=2.3cm,
+    headheight=26pt,headsep=8pt,footskip=1cm]{geometry}
+\fi
+\RequirePackage{iftex}
+\ifPDFTeX
+  \RequirePackage[utf8]{inputenc}
+  \RequirePackage[T1]{fontenc}
+\fi
+\ifcn@english
+  \RequirePackage[english]{babel}
+\else
+  \RequirePackage[dutch]{babel}
+\fi
+\RequirePackage{amsmath,amsthm}
+\RequirePackage{newpxtext}
+\RequirePackage[varbb]{newpxmath}
+\RequirePackage{microtype,csquotes,etoolbox}
+\RequirePackage{xcolor,graphicx,array,booktabs,tabularx,multicol,enumitem}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0.45em plus 0.1em minus 0.1em}
+\setlength{\emergencystretch}{1em}
+\linespread{1.05}
+\ifcn@onepager
+  \setlength{\parskip}{0.2em}
+  \linespread{1}
+\fi
+
+% Palette. Each box accepts any named xcolor colour as its second option.
+\definecolor{docblue}{RGB}{0,60,110}
+\definecolor{softgray}{RGB}{90,90,90}
+\definecolor{tiporange}{RGB}{172,96,0}
+\definecolor{alertred}{RGB}{185,30,40}
+\definecolor{leafgreen}{RGB}{20,130,60}
+\definecolor{slategray}{RGB}{100,115,135}
+
+\setlist{nosep,leftmargin=1.4em}
+\setlist[itemize]{label=\textcolor{docblue}{\textbullet}}
+\setlist[enumerate]{label=\textcolor{docblue}{\bfseries\arabic*.}}
+\RequirePackage{titlesec}
+\titleformat{\section}{\Large\bfseries\color{docblue}}
+  {\thesection\quad}{0pt}{}[{\color{docblue!60}\titlerule[0.4pt]}]
+\titleformat{\subsection}{\large\bfseries\color{docblue!85!black}}
+  {\thesubsection\quad}{0pt}{}
+\titleformat{\subsubsection}{\bfseries}{\thesubsubsection\quad}{0pt}{}
+\titlespacing*{\section}{0pt}{1em plus 0.3em minus 0.1em}{0.45em}
+\titlespacing*{\subsection}{0pt}{0.8em plus 0.2em}{0.3em}
+\titlespacing*{\subsubsection}{0pt}{0.6em plus 0.2em}{0.15em}
+\ifcn@unnumbered\setcounter{secnumdepth}{0}\fi
+
+% Shared visual foundations. No subject or document type is imposed.
+\RequirePackage[skins,breakable,raster]{tcolorbox}
+\usetikzlibrary{babel,positioning,arrows.meta,calc}
+\tcbset{
+  cn/base/.style={enhanced,breakable,sharp corners,boxrule=0pt,
+    left=10pt,right=10pt,top=6pt,bottom=6pt,
+    before skip=7pt,after skip=7pt},
+  cn/accent/.style={cn/base,frame hidden,colback=#1!7!white,
+    borderline west={2.5pt}{0pt}{#1}}
+}
+\ifcn@english
+  \def\cn@boxlabel{Box}
+\else
+  \def\cn@boxlabel{Kader}
+\fi
+
+% All six boxes: [Title][Colour][additional tcolorbox options].
+% Empty title = no title, except numberedbox which retains its number.
+\newcommand{\cn@inlinetitle}[2]{\ifstrempty{#1}{}{%
+  \textbf{\textcolor{#2}{#1}}\enspace}}
+\NewTColorBox{accentbox}{O{} O{docblue} O{}}{cn/accent=#2,
+  before upper={\cn@inlinetitle{#1}{#2}},#3}
+\NewTColorBox{framedbox}{O{} O{docblue} O{}}{cn/base,
+  colback=white,colframe=#2!35!white,boxrule=0.5pt,
+  borderline west={2.5pt}{0pt}{#2},
+  colbacktitle=#2!7!white,coltitle=#2,fonttitle=\bfseries\small,
+  titlerule=0pt,toptitle=3pt,bottomtitle=3pt,title={#1},#3}
+
+% Counter advances before the content, so an immediate \label works.
+\newcounter{notebox}
+\NewTColorBox{numberedbox}{O{} O{slategray} O{}}{cn/accent=#2,
+  code={\refstepcounter{notebox}},
+  before upper={{\small\color{#2}\textbf{\cn@boxlabel~\thenotebox}%
+    \ifstrempty{#1}{}{\enspace\textperiodcentered\enspace\textit{#1}}}\par\smallskip},#3}
+\NewTColorBox{cardbox}{O{} O{tiporange} O{}}{cn/accent=#2,
+  left=7pt,right=7pt,top=4pt,bottom=4pt,fontupper=\small,
+  before upper={\ifstrempty{#1}{}{\textbf{\textcolor{#2}{#1}}\par\smallskip}},#3}
+\NewTColorBox{solidbox}{O{} O{docblue} O{}}{cn/base,
+  colback=#2,colframe=#2,colupper=white,
+  before upper={\ifstrempty{#1}{}{\textbf{#1}\par\smallskip}},#3}
+
+% Two heading fields for any left/right pair, e.g. identifier and status.
+% Usage: \begin{splitbox}[Left heading][docblue] \rightheading{Right heading} ...
+\NewTColorBox{splitbox}{O{} O{docblue} O{}}{cn/accent=#2,
+  before upper={\ifstrempty{#1}{}{\textbf{\textcolor{#2}{#1}}}},#3}
+\newcommand{\rightheading}[1]{\hfill{\small\color{softgray}#1}\par\smallskip}
+
+% Define an accent-box environment with a reusable default title and colour.
+% Its interface remains [Title][Colour][additional tcolorbox options].
+\NewDocumentCommand{\newaccentbox}{m m m}{%
+  \NewTColorBox{#1}{O{#3} O{#2} O{}}{cn/accent=##2,
+    before upper={\cn@inlinetitle{##1}{##2}},##3}}
+
+% Helpers for structured explanations. Proofs use standard amsthm.
+\newenvironment{steps}[1][2.8cm]{%
+  \begin{description}[style=sameline,leftmargin=#1,
+    labelwidth=\dimexpr#1-0.25cm\relax,labelsep=0.25cm,itemsep=3pt,
+    font=\small\bfseries\color{docblue}]}{\end{description}}
+\newcommand{\step}[1]{\textcolor{docblue}{\textbf{#1}}\enspace}
+\newcommand{\reason}[1]{\text{\normalfont\small\color{softgray}#1}}
+
+% Metadata. Empty optional fields disappear from the title block.
+\pgfkeys{/cn/document/.is family,/cn/document,
+  title/.store in=\cn@title,subtitle/.store in=\cn@subtitle,
+  shorttitle/.store in=\cn@shorttitle,author/.store in=\cn@author,
+  affiliation/.store in=\cn@affiliation,partner/.store in=\cn@partner,
+  date/.store in=\cn@date,
+  title=TP,subtitle=,shorttitle=,author=,affiliation=,partner=,date=}
+\newcommand{\documentsetup}[1]{\pgfkeys{/cn/document,#1}}
+\newcommand{\cn@runningtitle}{%
+  \ifdefempty{\cn@shorttitle}{\cn@title}{\cn@shorttitle}}
+\newcommand{\cn@metaseparator}{}
+\newcommand{\cn@metaitem}[1]{\ifdefempty{#1}{}{%
+  \cn@metaseparator #1\def\cn@metaseparator{\enspace\textbar\enspace}}}
+
+% Running headings and page x/y. The first page has only a footer.
+\RequirePackage{fancyhdr,lastpage}
+\fancyhf{}
+\renewcommand{\headrulewidth}{0pt}
+\renewcommand{\footrulewidth}{0.3pt}
+\fancyhead[L]{\parbox[b]{0.47\textwidth}{\footnotesize\itshape
+  \color{softgray}\cn@runningtitle}}
+\fancyhead[R]{\parbox[b]{0.47\textwidth}{\raggedleft\footnotesize\itshape
+  \color{softgray}\nouppercase{\leftmark}}}
+\fancyfoot[R]{\footnotesize\color{softgray}\thepage\,/\,\pageref*{LastPage}}
+\renewcommand{\sectionmark}[1]{\markboth{#1}{}}
+\fancypagestyle{cnfirst}{\fancyhf{}\renewcommand{\headrulewidth}{0pt}
+  \renewcommand{\footrulewidth}{0.3pt}
+  \fancyfoot[R]{\footnotesize\color{softgray}\thepage\,/\,\pageref*{LastPage}}}
+\ifcn@onepager\pagestyle{empty}\else\pagestyle{fancy}\fi
+\newcommand{\makedocumenthead}{%
+  \ifcn@onepager\thispagestyle{empty}\else\thispagestyle{cnfirst}\fi
+  {\LARGE\bfseries\color{docblue}\cn@title\par}%
+  \ifdefempty{\cn@subtitle}{}{\vspace{0.25em}{\large\itshape\cn@subtitle\par}}%
+  {\color{softgray}\rule{\linewidth}{1pt}\par}%
+  {\small\color{softgray}\def\cn@metaseparator{}%
+    \cn@metaitem{\cn@author}\cn@metaitem{\cn@affiliation}%
+    \cn@metaitem{\cn@partner}\cn@metaitem{\cn@date}\par}\smallskip}
+
+\RequirePackage{caption}
+\captionsetup{font=small,labelfont={bf,color=docblue},labelsep=period}
+\RequirePackage[colorlinks=true,linkcolor=docblue,citecolor=docblue,
+  urlcolor=docblue,breaklinks=true]{hyperref}
+\urlstyle{same}
+\AtBeginDocument{\hypersetup{pdftitle={\cn@title},pdfauthor={\cn@author}}}
+\endinput
